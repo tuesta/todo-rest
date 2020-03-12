@@ -18,10 +18,8 @@ type TodoAPI
 api :: Proxy TodoAPI
 api = Proxy
 
-server :: ( Member (KVS Key Todo) r
-          , Member (Error TodoError) r
-          , Member (MonotonicSequence Key) r
-          ) => ServerT TodoAPI (Sem r)
+server :: Members '[KVS Key Todo,Error TodoError, MonotonicSequence Key] r
+       => ServerT TodoAPI (Sem r)
 server
   =    list
   :<|> fetch

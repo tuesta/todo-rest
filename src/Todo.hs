@@ -28,8 +28,7 @@ instance FromJSON Todo
 newTodo :: String -> Todo
 newTodo title  = Todo title False
 
-add :: ( Member (KVS Key Todo) r
-       , Member (MonotonicSequence Key) r) => Todo -> Sem r Key
+add :: Members '[KVS Key Todo, MonotonicSequence Key] r => Todo -> Sem r Key
 add todo = do
   key <- next
   insertKvs key todo
@@ -46,8 +45,7 @@ fetch k =
     Just todo -> pure todo
     Nothing -> throw $ TodoNotAvailable k
 
-toggle :: (Member (KVS Key Todo) r
-          ,Member (Error TodoError) r) => Key -> Sem r Todo
+toggle :: Members '[KVS Key Todo, Error TodoError] r => Key -> Sem r Todo
 toggle k = do
   todoErr <- getKvs k <&> justErr (TodoNotAvailable k)
   todo <- either throw pure todoErr
